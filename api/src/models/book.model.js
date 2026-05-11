@@ -26,7 +26,7 @@ async function criarLivro(titulo, autor, descricao, edicao, categoria) {
 
 async function atualizarLivro(id, titulo, autor, descricao, edicao, categoria) {
     const query = "UPDATE livros SET titulo = $2, autor = $3, descricao = $4, edicao = $5, categoria = $6 WHERE id = $1";
-    const result = await pool.query(query, [id, titulo, autor, descricao, edição, categoria]);
+    const result = await pool.query(query, [id, titulo, autor, descricao, edicao, categoria]);
     return result.rows[0];
 }
 
