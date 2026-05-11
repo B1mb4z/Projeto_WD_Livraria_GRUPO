@@ -1,6 +1,6 @@
 const express = require('express');
 const db = require('./backend/src/config/db');
-require('dotenv').config();
+require('dotenv').config({path: './backend/.env'});
 
 const app = express();
 
@@ -16,7 +16,7 @@ async function testConnection() {
 
 testConnection();
 
-const PORT = 3306;
+const PORT = process.env.DB_PORT;
 app.listen(PORT, () => {
     console.log(`Servidor a rodar na porta ${PORT}`);
 });
