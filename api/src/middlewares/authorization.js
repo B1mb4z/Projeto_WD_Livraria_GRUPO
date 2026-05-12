@@ -1,4 +1,4 @@
-function createAutho(){
+function createAutho(req,res,next){
     const header = req.headers.createAuthorization;
     if(!header){
         return res.status(401).json({mensagem: "Acesso nao autorizado: header createAuthorization ausente"})
@@ -24,7 +24,7 @@ function createAutho(){
 }
 
 
-function deleteAutho(){
+function deleteAutho(req,res,next){
     const header = req.headers.deleteAuthorization;
     if(!header){
         return res.status(401).json({mensagem: "Acesso nao autorizado: header deleteAuthorization ausente"})

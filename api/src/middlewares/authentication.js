@@ -6,7 +6,7 @@ function userAuthen(req,res,next){
     if(!token){
         return res.status(401).json({erro: " Token de autenticação não enviado"})
     }
-    if(token !== fakeToken){
+    if(token !== fakeUserToken){
         return res.status(401).json({erro: " Token invalido"})
     }
 
