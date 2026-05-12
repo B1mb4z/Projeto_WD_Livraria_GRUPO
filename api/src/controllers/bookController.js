@@ -15,7 +15,7 @@ async function listarLivroHdl(req,res, next) {
         const livro = await listarLivros();
         res.json(livro);
     }catch (err){
-        next(err)
+        errors(err)
     }
 }
 
@@ -25,7 +25,7 @@ async function obterLivroIdHdl(req,res, next){
         const livro = await obterLivroPorId(id);
         res.json(livro);
     }catch(err){
-        next(err)
+        errors(err)
     }
 }
 
@@ -35,7 +35,7 @@ async function obterLivroCatHdl(req,res, next){
         const livro = await obterLivroPorCat(cat);
         res.json(livro);
     }catch(err){
-        next(err)
+        errors(err)
     }
 }
 
@@ -45,7 +45,7 @@ async function criarLivroHdl(req,res, next){
         await criarLivro(titulo, autor, descricao, edicao, categoria);
         res.status(201).json({mensagem: ""});
     }catch(err){
-        next(err)
+        errors(err)
     }
 }
 
@@ -57,7 +57,7 @@ async function atualizarLivroHdl(req,res, next){
         const livro = await obterLivroPorId(id);
         res.json(livro);
     }catch (err){
-        next(err)
+        errors(err)
     }
 }
 
@@ -67,7 +67,7 @@ async function eliminarLivroHdl(req,res, next){
         await eliminarLivro(id);
         res.status(200).json({mensagem: "Livro eliminado."});
     }catch (err){
-        next(err)
+        errors(err)
     }
 }
 
