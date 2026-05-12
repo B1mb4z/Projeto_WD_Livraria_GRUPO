@@ -7,64 +7,67 @@ const{
     eliminarLivro
 } = require('../models/book.model')
 
-async function listarLivroHdl(req,res) {
+const{errors} = require('../middlewares/errors')
+//Hdl = Handler
+
+async function listarLivroHdl(req,res, next) {
     try{
         const livro = await listarLivros();
         res.json(livro);
-    }catch{
-        res.status(500).json({erro: "Erro!"})
+    }catch (err){
+        errors(err)
     }
 }
 
-async function obterLivroIdHdl(req,res){
+async function obterLivroIdHdl(req,res, next){
     try{
         const {id} = req.params;
         const livro = await obterLivroPorId(id);
         res.json(livro);
-    }catch(e){
-        res.status(500).json({erro: "Erro!"})
+    }catch(err){
+        errors(err)
     }
 }
 
-async function obterLivroCatHdl(req,res){
+async function obterLivroCatHdl(req,res, next){
     try{
         const {cat} = req.params;
         const livro = await obterLivroPorCat(cat);
         res.json(livro);
-    }catch(e){
-        res.status(500).json({erro: "Erro!"})
+    }catch(err){
+        errors(err)
     }
 }
 
-async function criarLivroHdl(req,res){
+async function criarLivroHdl(req,res, next){
     try{
         const {titulo, autor, descricao, edicao, categoria} = req.body;
         await criarLivro(titulo, autor, descricao, edicao, categoria);
         res.status(201).json({mensagem: ""});
-    }catch{
-        res.status(500).json({erro: "Erro!"})
+    }catch(err){
+        errors(err)
     }
 }
 
-async function atualizarLivroHdl(req,res){
+async function atualizarLivroHdl(req,res, next){
     try{
         const {titulo, autor, descricao, edicao, categoria} = req.body;
         const {id} = req.params;
         await atualizarLivro(id, titulo, autor, descricao, edicao, categoria);
         const livro = await obterLivroPorId(id);
         res.json(livro);
-    }catch (e){
-        res.status(500).json({erro: "Erro!"})
+    }catch (err){
+        errors(err)
     }
 }
 
-async function eliminarLivroHdl(req,res){
+async function eliminarLivroHdl(req,res, next){
     try{
         const {id} = req.params;
         await eliminarLivro(id);
-        res.status(200).json({mensagem: ""});
-    }catch (e){
-        res.status(500).json({erro: "Erro!"})
+        res.status(200).json({mensagem: "Livro eliminado."});
+    }catch (err){
+        errors(err)
     }
 }
 
