@@ -6,10 +6,10 @@ const port = 3000;
 
 app.use(express.json());
 
-const bookRoute = require('./routes/bookRoute');
+const bookRoute = require('./backend/src/routes/bookRoute');
 app.use('/livros', bookRoute);
 
-const errorHandler = require('./middlewares/errors');
+const errorHandler = require('./backend/src/middlewares/errors');
 app.use(errorHandler);
 
 app.listen(port, () => {
