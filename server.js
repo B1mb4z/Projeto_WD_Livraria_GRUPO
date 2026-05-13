@@ -1,23 +1,17 @@
+require('dotenv').config({ path: './backend/src/config/.env' });
+
 const express = require('express');
-const db = require('./backend/src/config/db');
-require('dotenv').config({path: './backend/.env'});
-
 const app = express();
+const port = 3000;
 
-// Teste de conexão simples
-async function testConnection() {
-    try {
-        const db = require('./backend/src/config/db');
-        await db.query('SELECT 1');
-        console.log('✅ Conexão com o MySQL estabelecida com sucesso!');
-    } catch (err) {
-        console.error('❌ Erro ao conectar à base de dados:', err.message);
-    }
-}
+app.use(express.json());
 
-testConnection();
+const bookRoute = require('./routes/bookRoute');
+app.use('/livros', bookRoute);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor a rodar na porta ${PORT}`);
+const errorHandler = require('./middlewares/errors');
+app.use(errorHandler);
+
+app.listen(port, () => {
+    console.log(`App a correr em http://localhost:${port}`);
 });

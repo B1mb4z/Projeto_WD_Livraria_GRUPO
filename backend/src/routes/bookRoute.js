@@ -10,7 +10,7 @@ const{userAuthen} = require('../middlewares/authentication')
 const{listarLivroHdl, obterLivroIdHdl, obterLivroCatHdl} = require('../controllers/bookController')
 router.get('/',listarLivroHdl)
 router.get('/:id',obterLivroIdHdl)
-router.get('/:cat',obterLivroCatHdl)
+router.get('/categoria/:cat',obterLivroCatHdl)
 
 //Inserir um Livro
 const{criarLivroHdl} = require('../controllers/bookController')
