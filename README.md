@@ -5,7 +5,7 @@
 ### 1. Clone o repositório
 
 ```bash
-git clone <url-do-repositorio>
+git clone <(https://github.com/B1mb4z/Projeto_WD_Livraria_GRUPO.git)>
 cd Projeto_WD_Livraria_GRUPO
 ```
 
