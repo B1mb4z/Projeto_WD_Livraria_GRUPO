@@ -1,13 +1,12 @@
+
+require('dotenv').config({ path: './backend/src/.env' }); 
 const express = require('express');
 const db = require('./backend/src/config/db');
-require('dotenv').config({path: './backend/.env'});
 
 const app = express();
 
-// Teste de conexão simples
 async function testConnection() {
     try {
-        const db = require('./backend/src/config/db');
         await db.query('SELECT 1');
         console.log('✅ Conexão com o MySQL estabelecida com sucesso!');
     } catch (err) {
