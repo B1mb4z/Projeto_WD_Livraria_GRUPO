@@ -34,7 +34,7 @@ DB_PORT=3000
 ### 1. Clonar o repositório
 
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/B1mb4z/Projeto_WD_Livraria_GRUPO.git
 cd livraria-api
 ```
 
