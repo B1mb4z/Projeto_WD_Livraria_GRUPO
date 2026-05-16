@@ -2,7 +2,24 @@
 
 API REST para gestão de uma livraria, desenvolvida com Node.js, Express e PostgreSQL.
 
----
+### 1. Clone o repositório
+
+```bash
+git clone <(https://github.com/B1mb4z/Projeto_WD_Livraria_GRUPO.git)>
+cd Projeto_WD_Livraria_GRUPO
+```
+
+### 2. Configure as variáveis de ambiente
+
+Crie o arquivo `backend/.env` com as credenciais do seu banco MySQL:
+
+```env
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=sua_senha
+DB_NAME=portal_leitura
+DB_PORT=3000
+```
 
 ## Requisitos
 
