@@ -4,11 +4,13 @@ const errorHandler = require('./middleware/errors')
 const bookRoute = require('./routes/bookRoute')
 const authRoute = require('./routes/authRoute')
 require('./config/db')
+const path = require('path')
 
 const app = express()
 const PORT = process.env.PORT || 3000
 
 app.use(express.json())
+app.use(express.static(path.join(__dirname, '../public')))
 
 // Rotas
 app.get('/', (req, res) => {

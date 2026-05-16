@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Livraria — Livros</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>Livraria</h1>
+  <button onclick="sair()">Sair</button>
+</header>
+
+<div class="container">
+
+  <div id="mensagem" class="mensagem"></div>
+
+  <!-- Formulario para adicionar livro -->
+  <div class="card">
+    <h2>Adicionar livro</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Titulo</label>
+        <input type="text" id="titulo" placeholder="Titulo do livro">
+      </div>
+      <div class="form-group">
+        <label>Autor</label>
+        <input type="text" id="autor" placeholder="Nome do autor">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Preco (€)</label>
+        <input type="number" id="preco" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Ano de edicao</label>
+        <input type="number" id="ano_edicao" placeholder="2024">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Sinopse</label>
+      <textarea id="sinopse" rows="3" placeholder="Breve descricao do livro"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Categoria</label>
+      <select id="categoria_id">
+        <option value="1">Ficcao Cientifica</option>
+        <option value="2">Romance</option>
+        <option value="3">Programacao</option>
+        <option value="4">Historia</option>
+      </select>
+    </div>
+    <button type="submit" onclick="criarLivro()">Adicionar livro</button>
+  </div>
+
+  <!-- Lista de livros -->
+  <div class="card">
+    <h2>Lista de livros</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Titulo</th>
+          <th>Autor</th>
+          <th>Preco</th>
+          <th>Categoria</th>
+          <th>Acao</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-livros">
+        <tr><td colspan="6">A carregar...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  const token = localStorage.getItem('token')
+
+  // Se nao tem token, volta ao login
+  if (!token) {
+    window.location.href = 'index.html'
+  }
+
+  function sair() {
+    localStorage.removeItem('token')
+    window.location.href = 'index.html'
+  }
+
+  function mostrarMensagem(texto, tipo) {
+    const el = document.getElementById('mensagem')
+    el.textContent = texto
+    el.className = 'mensagem ' + tipo
+    setTimeout(() => { el.className = 'mensagem' }, 3000)
+  }
+
+  async function carregarLivros() {
+    try {
+      const res = await fetch('/livros')
+      const livros = await res.json()
+
+      const tbody = document.getElementById('tabela-livros')
+
+      if (livros.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6">Nenhum livro encontrado.</td></tr>'
+        return
+      }
+
+      tbody.innerHTML = livros.map(livro => `
+        <tr>
+          <td>${livro.id}</td>
+          <td>${livro.titulo}</td>
+          <td>${livro.autor}</td>
+          <td>${parseFloat(livro.preco).toFixed(2)} €</td>
+          <td>${livro.categoria || '-'}</td>
+          <td>
+            <button class="btn-danger" onclick="apagarLivro(${livro.id})">Apagar</button>
+          </td>
+        </tr>
+      `).join('')
+    } catch (err) {
+      mostrarMensagem('Erro ao carregar os livros.', 'erro')
+    }
+  }
+
+  async function criarLivro() {
+    const titulo = document.getElementById('titulo').value
+    const autor = document.getElementById('autor').value
+    const preco = document.getElementById('preco').value
+    const ano_edicao = document.getElementById('ano_edicao').value
+    const sinopse = document.getElementById('sinopse').value
+    const categoria_id = document.getElementById('categoria_id').value
+
+    if (!titulo || !autor || !preco) {
+      return mostrarMensagem('Titulo, autor e preco sao obrigatorios.', 'erro')
+    }
+
+    try {
+      const res = await fetch('/livros', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ titulo, autor, preco, ano_edicao, sinopse, categoria_id })
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        return mostrarMensagem(data.erro, 'erro')
+      }
+
+      mostrarMensagem('Livro adicionado com sucesso.', 'sucesso')
+
+      // Limpar formulario
+      document.getElementById('titulo').value = ''
+      document.getElementById('autor').value = ''
+      document.getElementById('preco').value = ''
+      document.getElementById('ano_edicao').value = ''
+      document.getElementById('sinopse').value = ''
+
+      carregarLivros()
+    } catch (err) {
+      mostrarMensagem('Erro ao adicionar livro.', 'erro')
+    }
+  }
+
+  async function apagarLivro(id) {
+    if (!confirm('Tens a certeza que queres apagar este livro?')) return
+
+    try {
+      const res = await fetch('/livros/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        return mostrarMensagem(data.erro, 'erro')
+      }
+
+      mostrarMensagem('Livro apagado com sucesso.', 'sucesso')
+      carregarLivros()
+    } catch (err) {
+      mostrarMensagem('Erro ao apagar livro.', 'erro')
+    }
+  }
+
+  // Carregar livros ao abrir a pagina
+  carregarLivros()
+</script>
+
+</body>
+</html>
