@@ -3,8 +3,8 @@ const express = require('express')
 const errorHandler = require('./middleware/errors')
 const bookRoute = require('./routes/bookRoute')
 const authRoute = require('./routes/authRoute')
-require('./config/db')
 const path = require('path')
+require('./config/db')
 
 const app = express()
 const PORT = process.env.PORT || 3000
