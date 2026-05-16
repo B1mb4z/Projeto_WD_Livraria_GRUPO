@@ -1,6 +1,6 @@
-﻿# Projeto_WD_Livraria_GRUPO
+﻿# Livraria API
 
-## Instalação e Execução
+API REST para gestão de uma livraria, desenvolvida com Node.js, Express e PostgreSQL.
 
 ### 1. Clone o repositório
 
@@ -21,396 +21,209 @@ DB_NAME=portal_leitura
 DB_PORT=3000
 ```
 
-### 3. Instale as dependências
+## Requisitos
 
-```bash
-# Dependências da API principal
-cd api/src
-npm install
-
-# Dependências do backend (conexão com banco)
-cd ../../backend
-npm install
-```
-
-### 4. Configure o banco de dados
-
-Execute o script SQL para criar o banco e as tabelas:
-
-```bash
-mysql -u root -p < backend/src/config/db.sql
-```
-
-### 5. Inicie o servidor
-
-```bash
-# A partir da pasta api/src
-npm start
-```
-
-O servidor estará disponível em `http://localhost:3000`.
+- Node.js
+- PostgreSQL
+- npm
 
 ---
 
-## Estrutura do Projeto
+## Instalação
 
-```
-Projeto_WD_Livraria_GRUPO/
-├── server.js                      # Ponto de entrada principal (teste de conexão DB)
-├── api/
-│   ├── html/
-│   │   └── index.html             # Frontend estático (opcional)
-│   └── src/
-│       ├── server.js              # Servidor Express + registro de rotas
-│       ├── package.json
-│       ├── routes/
-│       │   └── bookRoute.js       # Definição das rotas de livros
-│       ├── controllers/
-│       │   └── bookController.js  # Lógica de cada endpoint (handlers)
-│       ├── middlewares/
-│       │   ├── authentication.js  # Verifica token de autenticação do utilizador
-│       │   ├── authorization.js   # Verifica permissão de criação ou eliminação
-│       │   └── errors.js          # Tratamento centralizado de erros
-│       └── models/
-│           └── book.model.js      # Queries SQL (acesso à base de dados)
-└── backend/
-    ├── package.json
-    └── src/
-        └── config/
-            ├── db.js              # Pool de conexão MySQL (via mysql2 + dotenv)
-            └── db.sql             # Script de criação do banco e tabelas
+### 1. Clonar o repositório
+
+```bash
+git clone <url-do-repositorio>
+cd livraria-api
 ```
 
----
+### 2. Instalar as dependências
 
-## Banco de Dados
+```bash
+npm install
+```
 
-O schema possui três tabelas principais:
+### 3. Configurar as variáveis de ambiente
+
+Criar um ficheiro `.env` na raiz do projeto com o seguinte conteúdo:
+
+```env
+PORT=3000
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASS=a_tua_password
+DB_NAME=livraria
+JWT_SECRET=uma_chave_secreta_longa
+```
+
+### 4. Criar a base de dados
+
+No pgAdmin ou psql, criar uma base de dados chamada `livraria` e executar o seguinte SQL:
 
 ```sql
--- Categorias dos livros
 CREATE TABLE categorias (
-    id          INT PRIMARY KEY AUTO_INCREMENT,
-    nome        VARCHAR(100) NOT NULL,
-    descricao   TEXT
+  id SERIAL PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL UNIQUE
 );
 
--- Livros do portal
+CREATE TABLE utilizadores (
+  id SERIAL PRIMARY KEY,
+  nome VARCHAR(150) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  criado_em TIMESTAMP DEFAULT NOW()
+);
+
 CREATE TABLE livros (
-    id           INT PRIMARY KEY AUTO_INCREMENT,
-    titulo       VARCHAR(255) NOT NULL,
-    capa         VARCHAR(255),
-    arquivo_pdf  VARCHAR(255),
-    sinopse      VARCHAR(400),
-    autor        VARCHAR(150),
-    ano_edicao   INT,
-    categoria_id INT,
-    FOREIGN KEY (categoria_id) REFERENCES categorias(id)
-);
-
--- Utilizadores registados
-CREATE TABLE usuarios (
-    id       INT PRIMARY KEY AUTO_INCREMENT,
-    nome     VARCHAR(100),
-    email    VARCHAR(100) UNIQUE,
-    password VARCHAR(255),
-    curso    VARCHAR(100)
+  id SERIAL PRIMARY KEY,
+  titulo VARCHAR(255) NOT NULL,
+  autor VARCHAR(150) NOT NULL,
+  sinopse TEXT,
+  preco NUMERIC(8,2) NOT NULL,
+  ano_edicao INT,
+  categoria_id INT REFERENCES categorias(id) ON DELETE SET NULL,
+  criado_em TIMESTAMP DEFAULT NOW()
 );
 ```
 
----
+### 5. Iniciar o servidor
 
-## Endereço Base da API
-
-```
-http://localhost:3000/livros
+```bash
+npm run dev
 ```
 
-| Método   | Rota           | Acesso      | Descrição                   |
-|----------|----------------|-------------|-----------------------------|
-| `GET`    | `/livros`      | Público     | Lista todos os livros       |
-| `GET`    | `/livros/:id`  | Público     | Obtém um livro pelo ID      |
-| `GET`    | `/livros/:cat` | Público     | Lista livros por categoria  |
-| `POST`   | `/livros`      | Autenticado | Cria um novo livro          |
-| `PATCH`  | `/livros/:id`  | Autenticado | Atualiza um livro existente |
-| `DELETE` | `/livros/:id`  | Autenticado | Elimina um livro            |
+O servidor fica disponivel em `http://localhost:3000`.
 
 ---
 
-## Exemplos de Requisições no Postman
+## Estrutura do projeto
 
-### GET público — Listar todos os livros
-
-| Campo  | Valor                          |
-|--------|--------------------------------|
-| Método | `GET`                          |
-| URL    | `http://localhost:3000/livros` |
-
-Sem headers obrigatórios. Clique em **Send**.
-
-**Resposta esperada (200 OK):**
-```json
-[
-  {
-    "id": 1,
-    "titulo": "O Alquimista",
-    "autor": "Paulo Coelho",
-    "sinopse": "A história de Santiago, um jovem pastor...",
-    "ano_edicao": 1988,
-    "categoria_id": 2,
-    "nome": "Ficção"
-  }
-]
+```
+livraria-api/
+├── src/
+│   ├── config/
+│   │   └── db.js
+|   |   └──tabelas.sql
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   └── bookController.js
+│   ├── middleware/
+│   │   ├── auth.js
+│   │   └── errors.js
+│   ├── models/
+│   │   ├── book.model.js
+│   │   └── user.model.js
+│   ├── routes/
+│   │   ├── authRoute.js
+│   │   └── bookRoute.js
+│   └── server.js
+├── .env
+├── .gitignore
+└── package.json
 ```
 
 ---
 
-### GET público — Obter livro por ID
+## Endpoints
 
-| Campo  | Valor                            |
-|--------|----------------------------------|
-| Método | `GET`                            |
-| URL    | `http://localhost:3000/livros/1` |
+### Autenticacao
 
-Sem headers obrigatórios. Substitua o `1` pelo ID desejado.
+| Metodo | Rota             | Descricao                        |
+|--------|------------------|----------------------------------|
+| POST   | /auth/register   | Regista um novo utilizador       |
+| POST   | /auth/login      | Faz login e devolve um token JWT |
 
-**Resposta esperada (200 OK):**
+### Livros
+
+| Metodo | Rota                        | Acesso      | Descricao                    |
+|--------|-----------------------------|-------------|------------------------------|
+| GET    | /livros                     | Publico     | Lista todos os livros        |
+| GET    | /livros/:id                 | Publico     | Devolve um livro por ID      |
+| GET    | /livros/categoria/:id       | Publico     | Lista livros por categoria   |
+| POST   | /livros                     | Autenticado | Cria um livro novo           |
+| PUT    | /livros/:id                 | Autenticado | Atualiza um livro existente  |
+| DELETE | /livros/:id                 | Autenticado | Apaga um livro               |
+
+As rotas autenticadas requerem o header `Authorization: Bearer <token>`, obtido no login.
+
+---
+
+## Exemplos de pedidos
+
+### Registar utilizador
+
+```
+POST /auth/register
+Content-Type: application/json
+
+{
+  "nome": "Joao",
+  "email": "joao@email.com",
+  "password": "123456"
+}
+```
+
+### Fazer login
+
+```
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "joao@email.com",
+  "password": "123456"
+}
+```
+
+Resposta:
+
 ```json
 {
-  "id": 1,
-  "titulo": "O Alquimista",
-  "autor": "Paulo Coelho",
-  "sinopse": "A história de Santiago, um jovem pastor...",
-  "ano_edicao": 1988,
-  "categoria_id": 2,
-  "nome": "Ficção"
+  "mensagem": "Login com sucesso",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
----
+### Criar livro (requer token)
 
-### POST com autenticação — Criar livro (sucesso)
+```
+POST /livros
+Authorization: Bearer <token>
+Content-Type: application/json
 
-| Campo  | Valor                          |
-|--------|--------------------------------|
-| Método | `POST`                         |
-| URL    | `http://localhost:3000/livros` |
-
-**Aba Headers:**
-
-| Key                   | Value                        |
-|-----------------------|------------------------------|
-| `Content-Type`        | `application/json`           |
-| `userAuthentication`  | `user-authen-token-01`       |
-| `createAuthorization` | `Creation token-creation-01` |
-
-**Aba Body → raw → JSON:**
-```json
 {
-  "titulo": "Dom Casmurro",
-  "autor": "Machado de Assis",
-  "descricao": "Clássico da literatura brasileira.",
-  "edicao": 1899,
-  "categoria": 1
-}
-```
-
-**Resposta esperada (201 Created):**
-```json
-{
-  "mensagem": "Livro criado com sucesso."
+  "titulo": "Duna",
+  "autor": "Frank Herbert",
+  "sinopse": "Uma saga epica num planeta desertico.",
+  "preco": 18.99,
+  "ano_edicao": 1965,
+  "categoria_id": 1
 }
 ```
 
 ---
 
-### DELETE com autenticação — Eliminar livro (sucesso)
+## Autenticacao
 
-| Campo  | Valor                            |
-|--------|----------------------------------|
-| Método | `DELETE`                         |
-| URL    | `http://localhost:3000/livros/1` |
+O sistema usa JWT (JSON Web Tokens). Apos fazer login, o token devolvido deve ser enviado no header de todos os pedidos protegidos:
 
-**Aba Headers:**
-
-| Key                   | Value                      |
-|-----------------------|----------------------------|
-| `userAuthentication`  | `user-authen-token-01`     |
-| `deleteAuthorization` | `Delete token-deleting-01` |
-
-**Resposta esperada (200 OK):**
-```json
-{
-  "mensagem": "Livro eliminado."
-}
 ```
+Authorization: Bearer <token>
+```
+
+O token tem validade de 8 horas.
 
 ---
 
-### POST sem header — Erro por ausência de autenticação (401)
+## Tecnologias
 
-| Campo  | Valor                          |
-|--------|--------------------------------|
-| Método | `POST`                         |
-| URL    | `http://localhost:3000/livros` |
-
-**Aba Headers:** não adicionar nenhum header de autenticação.
-
-**Aba Body → raw → JSON:**
-```json
-{
-  "titulo": "Livro Teste",
-  "autor": "Autor Teste"
-}
-```
-
-**Resposta esperada (401 Unauthorized):**
-```json
-{
-  "erro": "Token de autenticação não enviado"
-}
-```
-
----
-
-### POST com token inválido — Erro de autenticação (401)
-
-| Campo  | Valor                          |
-|--------|--------------------------------|
-| Método | `POST`                         |
-| URL    | `http://localhost:3000/livros` |
-
-**Aba Headers:**
-
-| Key                  | Value              |
-|----------------------|--------------------|
-| `Content-Type`       | `application/json` |
-| `userAuthentication` | `token-errado`     |
-
-**Aba Body → raw → JSON:**
-```json
-{
-  "titulo": "Livro Teste",
-  "autor": "Autor Teste"
-}
-```
-
-**Resposta esperada (401 Unauthorized):**
-```json
-{
-  "erro": "Token invalido"
-}
-```
-
----
-
-### POST com formato de autorização incorreto — Erro (401)
-
-| Campo  | Valor                          |
-|--------|--------------------------------|
-| Método | `POST`                         |
-| URL    | `http://localhost:3000/livros` |
-
-**Aba Headers:**
-
-| Key                   | Value                      |
-|-----------------------|----------------------------|
-| `Content-Type`        | `application/json`         |
-| `userAuthentication`  | `user-authen-token-01`     |
-| `createAuthorization` | `Bearer token-creation-01` |
-
-> O prefixo correto é `Creation`, não `Bearer`.
-
-**Resposta esperada (401 Unauthorized):**
-```json
-{
-  "mensagem": "Acesso não autorizado: O header deve ser do tipo Creation."
-}
-```
-
----
-
-## Tokens de referência rápida
-
-| Operação           | Header                | Valor                        |
-|--------------------|-----------------------|------------------------------|
-| Autenticação       | `userAuthentication`  | `user-authen-token-01`       |
-| Autorização CREATE | `createAuthorization` | `Creation token-creation-01` |
-| Autorização DELETE | `deleteAuthorization` | `Delete token-deleting-01`   |
-
----
-
-## Arquitetura e Conceitos
-
-### Estrutura de projeto Express
-
-O projeto segue uma arquitetura em camadas, separando responsabilidades de forma clara:
-
-- **`routes/`** — Define os endpoints e associa cada rota aos seus middlewares e controller.
-- **`controllers/`** — Contém os handlers (funções que recebem `req` e `res`) e coordenam o fluxo da requisição.
-- **`middlewares/`** — Funções intermediárias executadas antes dos controllers, responsáveis por autenticação, autorização e tratamento de erros.
-- **`models/`** — Encapsula todas as queries SQL, isolando o acesso ao banco de dados do restante da aplicação.
-
----
-
-### Roteamento e controllers bem definidos
-
-Em `bookRoute.js`, cada rota declara explicitamente quais middlewares são executados antes do controller:
-
-```js
-// Rota pública — sem middleware
-router.get('/', listarLivroHdl);
-
-// Rota protegida — autenticação + autorização antes do handler
-router.post('/', userAuthen, createAutho, criarLivroHdl);
-router.delete('/:id', userAuthen, deleteAutho, eliminarLivroHdl);
-```
----
-
-### Validação de dados com middleware
-
-Os middlewares de `authentication.js` e `authorization.js` verificam:
-
-1. **Presença do header** — se ausente, retorna `401` imediatamente.
-2. **Formato do header** — para autorização, espera-se o padrão `Tipo token` (ex: `Creation token-creation-01`).
-3. **Valor do token** — compara com o token esperado e bloqueia se inválido.
-
----
-
-### Tratamento de erros centralizado
-
-O ficheiro `errors.js` exporta um `errorHandler` que captura erros propagados pelos controllers:
-
-```js
-function errorHandler(err, req, res, next) {
-    const status = err.status || 500;
-    res.status(status).json({ error: 'Ocorreu um erro!!' });
-}
-```
-
-Todos os blocos `try/catch` dos controllers chamam esta função.
----
-
-### Middleware de autenticação básica com token
-
-A autenticação é implementada como um **token estático** passado via header HTTP customizado (`userAuthentication`). O fluxo é:
-
-```
-Requisição
-    │
-    ▼
-userAuthen (authentication.js)
-    │  Verifica header "userAuthentication"
-    │  Token correto? → next()
-    │  Token ausente/inválido? → 401
-    ▼
-createAutho / deleteAutho (authorization.js)
-    │  Verifica header "createAuthorization" ou "deleteAuthorization"
-    │  Formato "Tipo token" correto? → next()
-    │  Inválido? → 401
-    ▼
-Controller (bookController.js)
-    │  Executa a operação no banco de dados
-    ▼
-Resposta HTTP
-```
+- Node.js
+- Express
+- PostgreSQL
+- pg (driver PostgreSQL)
+- jsonwebtoken
+- bcryptjs
+- dotenv
+- nodemon
