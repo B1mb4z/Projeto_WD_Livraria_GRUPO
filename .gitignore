@@ -1,6 +1,2 @@
-/.idea/
-/api/src/package.json
-.env
 node_modules/
-/uploads
-/backend/src/config/env
+.env
